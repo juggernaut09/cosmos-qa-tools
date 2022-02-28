@@ -1,0 +1,1 @@
+# This repo contains all python scripts which can be used for quickly setting up a local test environment for any Cosmos based network with n number of nodes and m number of accounts. It installs go if it's not already installed on the system and also installs all the dependencies along with it.

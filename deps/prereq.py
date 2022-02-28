@@ -12,7 +12,7 @@ if is_tool('go'):
     print("Golang is already installed")
 else:
     print("Install dependencies")
-    os.chdir(os.path.expanduser('~'))
+    # os.chdir(os.path.expanduser('~'))
     subprocess.run(['sudo', 'apt', 'update'])
     subprocess.run(['sudo', 'apt', 'install', 'build-essential', 'jq', '-y'])
     subprocess.run(['wget', 'https://dl.google.com/go/go1.17.3.linux-amd64.tar.gz'])

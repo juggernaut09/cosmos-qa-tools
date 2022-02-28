@@ -32,7 +32,7 @@ else:
     # bash_object.write('export PATH=$PATH:/usr/local/go/bin:$GOBIN\n')
     # bash_object.close()
     # subprocess.run(['.', '{}/.bashrc'.format(os.environ['HOME'])])
-    subprocess.run(['sudo', '{}/deps/env_set.sh'.format(os.getcwd())])
+    subprocess.run(['sudo', 'sh', '{}/deps/env_set.sh'.format(os.getcwd())])
     subprocess.run(['sudo', 'mkdir', '-p', '{}'.format(os.environ['GOBIN'])])
     subprocess.run(['sudo', 'mkdir', '-p', '{}/src/github.com'.format(os.environ['GOPATH'])])
     subprocess.run(['go', 'version'])

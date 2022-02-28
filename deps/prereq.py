@@ -27,7 +27,7 @@ else:
     bash_object.write('export GOBIN=$GOPATH/bin\n')
     bash_object.write('export PATH=$PATH:/usr/local/go/bin:$GOBIN\n')
     bash_object.close()
-    subprocess.run(['source', '{}/.bashrc'.format(os.environ['HOME'])])
+    subprocess.run(['.', '{}/.bashrc'.format(os.environ['HOME'])])
     subprocess.run(['mkdir', '-p', '{}'.format(os.environ['GOBIN'])])
     subprocess.run(['mkdir', '-p', '{}/src/github.com'.format(os.environ['GOPATH'])])
     subprocess.run(['go', 'version'])

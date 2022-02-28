@@ -17,8 +17,4 @@ def display_usage():
         print("** Please export all the necessary env variables  :: \n")
         print(s)
     sys.exit()
-
 display_usage()
-
-
-

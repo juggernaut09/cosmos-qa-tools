@@ -1,5 +1,4 @@
 import os
-from re import sub
 import subprocess
 
 def is_tool(binary):
@@ -32,6 +31,7 @@ else:
     bash_object.write('export GOBIN=$GOPATH/bin\n')
     bash_object.write('export PATH=$PATH:/usr/local/go/bin:$GOBIN\n')
     bash_object.close()
+    print("------ Run source ~/.bashrc cmd to set the path ------")
 
 
 

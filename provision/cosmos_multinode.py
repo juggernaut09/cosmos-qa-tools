@@ -42,7 +42,7 @@ subprocess.run(['which', 'cosmovisor'])
 if not os.getenv('GH_URL'):
     sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
 
-os.environ['REPO'] = os.getenv('GH_URL').split('/')[1].split('.')[0]
+os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
 print(f"--------- Install {os.getenv('DAEMON')} ---------")
 subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
 os.chdir(f"{os.getenv('REPO')}")

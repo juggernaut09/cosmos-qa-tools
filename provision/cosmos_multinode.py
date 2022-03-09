@@ -66,11 +66,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
 
 ### remove daemon home directories if it already exists
 for i in range(1, int(os.getenv('NODES')) + 1):
-    os.rmdir(f"{os.getenv('DAEMON_HOME')}-{i}")
-
-
-
-
-
-
-
+    try:
+        os.rmdir(f"{os.getenv('DAEMON_HOME')}-{i}")
+    except FileNotFoundError:
+        print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")

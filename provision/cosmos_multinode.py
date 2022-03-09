@@ -25,8 +25,8 @@ args = parser.parse_args()
 
 print(f" ** Number of nodes : {args.nodes} and accounts : {args.accounts} to be setup **")
 
-os.environ['NODES'] = args.nodes
-os.environ['ACCOUNTS'] = args.accounts
+os.environ['NODES'] = str(args.nodes)
+os.environ['ACCOUNTS'] = str(args.accounts)
 
 os.chdir(os.path.expanduser('~'))
 

@@ -47,17 +47,17 @@ os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
 
 ### DENOM Installation
 print(f"--------- Install {os.getenv('DAEMON')} ---------")
-if is_tool(os.getenv('DENOM')):
-    print(f"Found {os.getenv('DENOM')} already installed.\n")
-    print(f"Skipping the {os.getenv('DENOM')} installation.\n")
+if is_tool(os.getenv('DAEMON')):
+    print(f"Found {os.getenv('DAEMON')} already installed.\n")
+    print(f"Skipping the {os.getenv('DAEMON')} installation.\n")
 else:
     subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
     os.chdir(f"{os.getenv('REPO')}")
     subprocess.run(['git', 'fetch'])
     subprocess.run(['git', 'checkout', f"{os.getenv('CHAIN_VERSION')}"])
     subprocess.run(['make', 'install'])
-    os.chdir(os.path.expanduser('~'))
-
+    
+os.chdir(os.path.expanduser('~'))
 subprocess.run([f"{os.getenv('DAEMON')}", 'version', '--long']) # check DAEMON version
 
 

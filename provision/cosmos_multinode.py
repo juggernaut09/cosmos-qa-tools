@@ -3,12 +3,8 @@ import os
 import subprocess
 import sys
 
-from utils import is_tool
 from dotenv import load_dotenv
-
 load_dotenv()
-
-parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
 
 def node_type(x):
     x = int(x)
@@ -16,7 +12,12 @@ def node_type(x):
         raise argparse.ArgumentTypeError(f"The number of nodes should be Min. 2, you have entered {x}")
     return x
 
+def is_tool(binary):
+    """Check whether `name` is on PATH and marked as executable."""
+    from shutil import which
+    return which(binary) is not None
 
+parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be created. Min. 2 should be given')
 parser.add_argument('accounts', type= int, help= 'Number of Accounts to be created. If not please enter 0')
 

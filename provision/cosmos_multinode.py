@@ -37,7 +37,7 @@ if is_tool('cosmovisor'):
 else:
     subprocess.run(['go', 'install', 'github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0'])
 
-subprocess.run(['strings', '$(which cosmovisor)', '|', 'egrep', '-e', "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"])
+subprocess.run(['which', 'cosmovisor'])
 
 if not os.getenv('GH_URL'):
     sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
@@ -45,7 +45,7 @@ if not os.getenv('GH_URL'):
 os.environ['REPO'] = os.getenv('GH_URL').split('/')[1].split('.')[0]
 print(f"--------- Install {os.getenv('DAEMON')} ---------")
 subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
-os.chdir(f"{os.getenv['REPO']}")
+os.chdir(f"{os.getenv('REPO')}")
 subprocess.run(['git', 'fetch'])
 subprocess.run(['git', 'checkout', f"{os.getenv('CHAIN_VERSION')}"])
 subprocess.run('make', 'install')

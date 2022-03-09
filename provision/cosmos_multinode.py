@@ -64,7 +64,9 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     print(f"Deamon path :: {os.getenv('DAEMON_HOME')}-{i}\n")
     print(f"****** here command {os.getenv('DAEMON')} unsafe-reset-all  --home {os.getenv('DAEMON_HOME')}-{i} ******")
 
-
+### remove daemon home directories if it already exists
+for i in range(1, int(os.getenv('NODES')) + 1):
+    os.rmdir(f"{os.getenv('DAEMON_HOME')}-{i}")
 
 
 

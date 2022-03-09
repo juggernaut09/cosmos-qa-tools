@@ -1,11 +1,6 @@
 import os
 import subprocess
-
-def is_tool(binary):
-    """Check whether `name` is on PATH and marked as executable."""
-    from shutil import which
-    return which(binary) is not None
-
+from utils import is_tool
 
 if is_tool('go'):
     print("Golang is already installed")

@@ -17,17 +17,14 @@ def is_tool(binary):
     from shutil import which
     return which(binary) is not None
 
+### Fetch NODES and ACCOUNTS values
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be created. Min. 2 should be given')
 parser.add_argument('accounts', type= int, help= 'Number of Accounts to be created. If not please enter 0')
-
 args = parser.parse_args()
-
 print(f" ** Number of nodes : {args.nodes} and accounts : {args.accounts} to be setup **")
-
 os.environ['NODES'] = str(args.nodes)
 os.environ['ACCOUNTS'] = str(args.accounts)
-
 os.chdir(os.path.expanduser('~'))
 
 ### Cosmosvisor installation
@@ -45,6 +42,7 @@ if not os.getenv('GH_URL'):
 
 os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
 
+
 ### DENOM Installation
 print(f"--------- Install {os.getenv('DAEMON')} ---------")
 if is_tool(os.getenv('DAEMON')):
@@ -59,6 +57,14 @@ else:
     
 os.chdir(os.path.expanduser('~'))
 subprocess.run([f"{os.getenv('DAEMON')}", 'version', '--long']) # check DAEMON version
+
+### export daemon home paths
+for i in range(1, int(os.getenv('NODES')) + 1):
+    os.environ[f'DAEMON_HOME_{i}'] = f"{os.getenv('DAEMON_HOME')}-{i}"
+    print(f"Deamon path :: {os.getenv('DAEMON_HOME')}-{i}\n")
+    print(f"****** here command {os.getenv('DAEMON')} unsafe-reset-all  --home {os.getenv('DAEMON_HOME')}-{i} ******")
+
+
 
 
 

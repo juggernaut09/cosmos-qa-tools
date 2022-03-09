@@ -48,7 +48,7 @@ subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
 os.chdir(f"{os.getenv('REPO')}")
 subprocess.run(['git', 'fetch'])
 subprocess.run(['git', 'checkout', f"{os.getenv('CHAIN_VERSION')}"])
-subprocess.run('make', 'install')
+subprocess.run(['make', 'install'])
 os.chdir(os.path.expanduser('~'))
 
 ### check version

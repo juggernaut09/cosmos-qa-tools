@@ -30,6 +30,7 @@ os.environ['ACCOUNTS'] = str(args.accounts)
 
 os.chdir(os.path.expanduser('~'))
 
+### Cosmosvisor installation
 print("--------- Install cosmovisor-------")
 if is_tool('cosmovisor'):
     print("Found cosmovisor already installed.\n")
@@ -37,22 +38,27 @@ if is_tool('cosmovisor'):
 else:
     subprocess.run(['go', 'install', 'github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0'])
 
-subprocess.run(['which', 'cosmovisor'])
+subprocess.run(['which', 'cosmovisor']) # Print the cosmovisor location
 
 if not os.getenv('GH_URL'):
     sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
 
 os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
-print(f"--------- Install {os.getenv('DAEMON')} ---------")
-subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
-os.chdir(f"{os.getenv('REPO')}")
-subprocess.run(['git', 'fetch'])
-subprocess.run(['git', 'checkout', f"{os.getenv('CHAIN_VERSION')}"])
-subprocess.run(['make', 'install'])
-os.chdir(os.path.expanduser('~'))
 
-### check version
-subprocess.run([f"{os.getenv('DAEMON')}", 'version', '--long'])
+### DENOM Installation
+print(f"--------- Install {os.getenv('DAEMON')} ---------")
+if is_tool(os.getenv('DENOM')):
+    print(f"Found {os.getenv('DENOM')} already installed.\n")
+    print(f"Skipping the {os.getenv('DENOM')} installation.\n")
+else:
+    subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
+    os.chdir(f"{os.getenv('REPO')}")
+    subprocess.run(['git', 'fetch'])
+    subprocess.run(['git', 'checkout', f"{os.getenv('CHAIN_VERSION')}"])
+    subprocess.run(['make', 'install'])
+    os.chdir(os.path.expanduser('~'))
+
+subprocess.run([f"{os.getenv('DAEMON')}", 'version', '--long']) # check DAEMON version
 
 
 

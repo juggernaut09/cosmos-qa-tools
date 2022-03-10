@@ -1,9 +1,9 @@
 import argparse
-from cmath import e
 import os
 import subprocess
 import sys
 import shutil
+import requests
 
 from dotenv import load_dotenv
 from subprocess import check_output
@@ -121,4 +121,47 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     key_address = check_output([f"{os.getenv('DAEMON')}", 'keys', 'show', f"validator{i}", '-a', '--home', f"{os.getenv('DAEMON_HOME')}-{i}", '--keyring-backend', 'test'])
     address = key_address.strip().decode()
     subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", 'add-genesis-account', f"{address}", f"1000000000000{os.getenv('DENOM')}"])
-print(f"--------Genesis created for {os.getenv('NODES')} nodes")
+print(f"--------Genesis created for {os.getenv('NODES')} nodes-----------")
+
+### "----------Genesis creation for accounts---------"
+
+if not int(os.getenv('ACCOUNTS')):
+    print("----- Argument for accounts is not present, not creating any additional accounts --------")
+else:
+    for i in range(1, int(os.getenv('ACCOUNTS')) + 1):
+        key_address = check_output([f"{os.getenv('DAEMON')}", 'keys', 'show', f"account{i}", '-a', '--home', f"{os.getenv('DAEMON_HOME')}-1", '--keyring-backend', 'test'])
+        address = key_address.strip().decode()
+        print(f"cmd ::{os.getenv('DAEMON')} --home {os.getenv('DAEMON_HOME')}-1 add-genesis-account {address} 1000000000000{os.getenv('DENOM')}")
+        subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", 'add-genesis-account', f"{address}", f"1000000000000{os.getenv('DENOM')}"])
+    print("----------Genesis created for accounts---------")
+
+### "--------Gentx--------"
+print("--------Gentx--------")
+for i in range(1, int(os.getenv('NODES')) + 1):
+    subprocess.run([f"{os.getenv('DAEMON')}", 'gentx', f"validator{i}", f"90000000000{os.getenv('DENOM')}", '--chain-id', f"{os.getenv('CHAINID')}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
+
+### "---------Copy all gentxs to $DAEMON_HOME-1----------"
+print(f"---------Copy all gentxs to {os.getenv('DAEMON_HOME')}-1----------")
+for i in range(2, int(os.getenv('NODES')) + 1):
+    shutil.copy(f"{os.getenv('DAEMON_HOME')}-{i}/config/gentx/*.json", f"{os.getenv('DAEMON_HOME')}-1/config/gentx/")
+
+### "----------collect-gentxs------------"
+subprocess.run([f"{os.getenv('DAEMON')}", 'collect-gentxs', '--home', f"{os.getenv('DAEMON_HOME')}-1"])
+
+print(f"---------Updating ${os.getenv('DAEMON_HOME')}-1 genesis.json ------------")
+subprocess.run(['sed', '-i', 's/172800000000000/600000000000/g', f"{os.getenv('DAEMON_HOME')}-1/config/genesis.json"])
+subprocess.run(['sed', '-i', 's/172800s/600s/g', f"{os.getenv('DAEMON_HOME')}-1/config/genesis.json"])
+subprocess.run(['sed', '-i', f"s/stake/{os.getenv('DENOM')}/g", f"{os.getenv('DAEMON_HOME')}-1/config/genesis.json"])
+
+print(f"---------Distribute genesis.json of {os.getenv('DAEMON_HOME')}-1 to remaining nodes-------")
+for i in range(2, int(os.getenv('NODES')) + 1):
+    shutil.copy(f"{os.getenv('DAEMON_HOME')}-1/config/genesis.json", f"{os.getenv('DAEMON_HOME')}-{i}/config/")
+
+print(f"---------Getting public IP address-----------")
+r = requests.get('https://ipinfo.io/ip')
+IP = r.text
+
+if not IP:
+    IP = "127.0.0.1"
+
+print(f"IP : {IP}")

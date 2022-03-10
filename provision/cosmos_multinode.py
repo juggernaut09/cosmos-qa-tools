@@ -71,7 +71,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
 ### remove daemon home directories if it already exists
 for i in range(1, int(os.getenv('NODES')) + 1):
     try:
-        os.rmdir(f"{os.getenv('DAEMON_HOME')}-{i}")
+        shutil.rmtree(f"{os.getenv('DAEMON_HOME')}-{i}")
         print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
     except FileNotFoundError:
         print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")

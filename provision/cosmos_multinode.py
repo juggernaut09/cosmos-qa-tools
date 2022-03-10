@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import shutil
-from tkinter import E
 
 from dotenv import load_dotenv
 from subprocess import check_output

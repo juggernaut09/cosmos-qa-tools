@@ -209,3 +209,45 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     subprocess.run(['sed', '-i', '/max_num_outbound_peers =/c\max_num_outbound_peers = 110',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
 
 print("Updated the configuration files")
+
+### create system services
+
+for i in range(1, int(os.getenv('NODES')) + 1):
+    DIFF = i - 1
+    INC = DIFF * 2
+    RPC = 16657 + INC
+    print(f"---------Creating {os.getenv('DAEMON_HOME')}-{i} system file---------")
+    # bash_object = open(f"/lib/systemd/system/{os.getenv('DAEMON')}-{i}.service", 'a')
+    # bash_object.write("[unit]\n")
+    # bash_object.write(f"Description={os.getenv('DAEMON')} daemon\n")
+    # bash_object.write("After=network.target\n")
+    # bash_object.write("[Service]\n")
+    # bash_object.write(f"Environment=\"DAEMON_HOME={os.getenv('DAEMON_HOME')}-{i}\"\n")
+    # bash_object.write(f"Environment=\"DAEMON_NAME={os.getenv('DAEMON')}\"\n")
+    # bash_object.write('Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"')
+    # bash_object.write()
+    service_file = f"""
+    [Unit]
+    Description={os.getenv('DAEMON')} daemon
+    After=network.target
+    [Service]
+    Environment="DAEMON_HOME={os.getenv('DAEMON_HOME')}-$a"
+    Environment="DAEMON_NAME={os.getenv('DAEMON')}"
+    Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+    Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+    Environment="UNSAFE_SKIP_BACKUP=false"
+    Type=simple
+    User={os.getenv('USER')}
+    ExecStart={shutil.which('cosmovisor')} start --home {os.getenv('DAEMON_HOME')}-{i}
+    Restart=on-failure
+    RestartSec=3
+    LimitNOFILE=4096
+    [Install]
+    WantedBy=multi-user.target"""
+
+    f = open(f"/lib/systemd/system/{os.getenv('DAEMON')}-{i}.service", "w+")
+    f.write(service_file)
+    f.close()
+
+print("----------Written service files")
+

@@ -2,8 +2,11 @@ import argparse
 import os
 import subprocess
 import sys
+import shutil
 
 from dotenv import load_dotenv
+from subprocess import check_output
+
 load_dotenv()
 
 def node_type(x):
@@ -68,5 +71,47 @@ for i in range(1, int(os.getenv('NODES')) + 1):
 for i in range(1, int(os.getenv('NODES')) + 1):
     try:
         os.rmdir(f"{os.getenv('DAEMON_HOME')}-{i}")
+        print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
     except FileNotFoundError:
         print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")
+
+
+### Creating daemon home directories
+print("-----Creating daemon home directories------")
+for i in range(1, int(os.getenv('NODES'))+1):
+    print(f"****** create dir :: {os.getenv('DAEMON_HOME')}-{i} ********\n")
+    os.mkdir(f"{os.getenv('DAEMON_HOME')}-{i}")
+    os.mkdir(f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin")
+    shutil.copy(src=f"{shutil.which(os.getenv('DAEMON'))}", dst=f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin/")
+
+### --------Start initializing the chain CHAINID ---------
+print(f"--------Start initializing the chain {os.getenv('CHAINID')}---------")
+for i in range(1, int(os.getenv('NODES'))+1):
+    print(f"-------Init chain {i}--------")
+    print(f"Deamon home :: {os.getenv('DAEMON_HOME')}-{i}")
+    subprocess.run([f"{os.getenv('DAEMON')}", 'init', '--chain-id', f"{os.getenv('CHAINID')}", f"{os.getenv('DAEMON_HOME')}-{i}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
+
+### ------------Creating $NODES keys---------------
+print(f"---------Creating {os.getenv('NODES')} keys-------------")
+for i in range(1, int(os.getenv('NODES')) + 1):
+    subprocess.run([f"{os.getenv('DAEMON')}", 'keys', 'add', f"validator{i}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
+
+### add accounts if second argument is passed
+if int(os.getenv('ACCOUNTS')):
+    print("----- Argument for accounts is not present, not creating any additional accounts --------")
+else:
+    print(f"---------Creating {os.getenv('ACCOUNTS')} accounts-------------")
+    for i in range(1, int(os.getenv('ACCOUNTS')) + 1):
+        subprocess.run([f"{os.getenv('DAEMON')}", 'keys', 'add', f"account{i}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
+
+### ----------Genesis creation---------
+print("----------Genesis creation---------")
+for i in range(1, int(os.getenv('NODES')) + 1):
+    if i == 1:
+        subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", "1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
+        print(f"done {os.getenv('DAEMON_HOME')}-{i} genesis creation")
+        continue
+    subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", f"1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
+    key_address = check_output([f"{os.getenv('DAEMON')}", 'keys', 'show', f"validator{i}", '-a', '--home', f"{os.getenv('DAEMON_HOME')}-{i}", '--keyring-backend', 'test'])
+    address = key_address.strip().decode()
+    subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", f"{address}", f"1000000000000{os.getenv('DENOM')}"])

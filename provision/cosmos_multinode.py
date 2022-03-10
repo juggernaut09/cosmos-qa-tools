@@ -201,7 +201,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     subprocess.run(['sed', '-i', f"s#tcp://127.0.0.1:26657#tcp://0.0.0.0:{RPC}#g", f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
     subprocess.run(['sed', '-i', f"s#tcp://0.0.0.0:26656#tcp://0.0.0.0:{LADDR}#g", f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
     subprocess.run(['sed', '-i', f"/persistent_peers =/c\persistent_peers = \"{PERSISTENT_PEERS}\"", f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
-    subprocess.run(['sed', '-i', '/allow_duplicate_ip =/c/allow_duplicate_ip = true',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', '/allow_duplicate_ip =/callow_duplicate_ip = true',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
     subprocess.run(['sed', '-i', '/pprof_laddr =/c\# pprof_laddr = "localhost:6060"',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
     subprocess.run(['sed', '-i', f"s#0.0.0.0:9090#0.0.0.0:{GRPC}#g",  f"{os.getenv('DAEMON_HOME')}-{i}/config/app.toml"])
     subprocess.run(['sed', '-i', f"s#0.0.0.0:9091#0.0.0.0:{WGRPC}#g",  f"{os.getenv('DAEMON_HOME')}-{i}/config/app.toml"])

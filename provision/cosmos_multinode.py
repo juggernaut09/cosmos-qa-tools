@@ -245,14 +245,5 @@ WantedBy=multi-user.target"""
     print(f"-------Starting {os.getenv('DAEMON')}-{i} service-------")
     subprocess.run(['sudo', '-S', 'systemctl', 'daemon-reload'])
     subprocess.run(['sudo', '-S', 'systemctl', 'start', f"{os.getenv('DAEMON')}-{i}.service"])
-
-print("-------------Taking time to initialize the chains-----------\n")
-time.sleep(30)
-
-for i in range(1, int(os.getenv('NODES')) + 1):
-    DIFF = i - 1
-    INC = DIFF * 2
-    RPC = 16657 + INC
-    print(f"Checking {os.getenv('DAEMON_HOME')}-{i} chain status")
-    subprocess.run([f"{os.getenv('DAEMON')}", 'status', '--node', f"tcp://localhost:{RPC}"])
+    print(f"cmd :: {os.getenv('DAEMON')} status --node tcp://localhost:{RPC}")
 

@@ -108,7 +108,7 @@ if not int(os.getenv('ACCOUNTS')):
 else:
     print(f"---------Creating {os.getenv('ACCOUNTS')} accounts-------------")
     for i in range(1, int(os.getenv('ACCOUNTS')) + 1):
-        subprocess.run([f"{os.getenv('DAEMON')}", 'keys', 'add', f"account{i}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
+        subprocess.run([f"{os.getenv('DAEMON')}", 'keys', 'add', f"account{i}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-1"])
 
 ### ----------Genesis creation---------
 print("----------Genesis creation---------")

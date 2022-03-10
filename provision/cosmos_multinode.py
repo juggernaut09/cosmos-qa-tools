@@ -227,23 +227,25 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     # bash_object.write('Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"')
     # bash_object.write()
     service_file = f"""
-    [Unit]
-    Description={os.getenv('DAEMON')} daemon
-    After=network.target
-    [Service]
-    Environment="DAEMON_HOME={os.getenv('DAEMON_HOME')}-$a"
-    Environment="DAEMON_NAME={os.getenv('DAEMON')}"
-    Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
-    Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
-    Environment="UNSAFE_SKIP_BACKUP=false"
-    Type=simple
-    User={os.getenv('USER')}
-    ExecStart={shutil.which('cosmovisor')} start --home {os.getenv('DAEMON_HOME')}-{i}
-    Restart=on-failure
-    RestartSec=3
-    LimitNOFILE=4096
-    [Install]
-    WantedBy=multi-user.target"""
+[Unit]
+Description={os.getenv('DAEMON')} daemon
+After=network.target
+
+[Service]
+Environment="DAEMON_HOME={os.getenv('DAEMON_HOME')}-{i}"
+Environment="DAEMON_NAME={os.getenv('DAEMON')}"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+Environment="UNSAFE_SKIP_BACKUP=false"
+Type=simple
+User={os.getenv('USER')}
+ExecStart={shutil.which('cosmovisor')} start --home {os.getenv('DAEMON_HOME')}-{i}
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target"""
 
     f = open(f"/lib/systemd/system/{os.getenv('DAEMON')}-{i}.service", "w+")
     f.write(service_file)

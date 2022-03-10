@@ -103,7 +103,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     subprocess.run([f"{os.getenv('DAEMON')}", 'keys', 'add', f"validator{i}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
 
 ### add accounts if second argument is passed
-if int(os.getenv('ACCOUNTS')):
+if not int(os.getenv('ACCOUNTS')):
     print("----- Argument for accounts is not present, not creating any additional accounts --------")
 else:
     print(f"---------Creating {os.getenv('ACCOUNTS')} accounts-------------")
@@ -114,10 +114,10 @@ else:
 print("----------Genesis creation---------")
 for i in range(1, int(os.getenv('NODES')) + 1):
     if i == 1:
-        subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", "1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
+        subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", f"1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
         print(f"done {os.getenv('DAEMON_HOME')}-{i} genesis creation")
         continue
     subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", f"1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
     key_address = check_output([f"{os.getenv('DAEMON')}", 'keys', 'show', f"validator{i}", '-a', '--home', f"{os.getenv('DAEMON_HOME')}-{i}", '--keyring-backend', 'test'])
     address = key_address.strip().decode()
-    subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", f"{address}", f"1000000000000{os.getenv('DENOM')}"])
+    subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", 'add-genesis-account', f"{address}", f"1000000000000{os.getenv('DENOM')}"])

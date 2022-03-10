@@ -250,6 +250,11 @@ WantedBy=multi-user.target"""
     f = open(f"/lib/systemd/system/{os.getenv('DAEMON')}-{i}.service", "w+")
     f.write(service_file)
     f.close()
+    print(f"-------Starting {os.getenv('DAEMON')}-{i} service-------")
+    subprocess.run(['sudo', '-S', 'systemctl', 'daemon-reload'])
+    subprocess.run(['sudo', '-S', 'systemctl', 'start', f"{os.getenv('DAEMON')}-{i}.service"])
+    subprocess.run(['sleep', 'ls'])
+    print(f"Checking {os.getenv('DAEMON_HOME')}-{i} chain status")
+    subprocess.run([f"{os.getenv('DAEMON')}", 'status', '--node', f"tcp://localhost:{RPC}"])
 
-print("----------Written service files")
 

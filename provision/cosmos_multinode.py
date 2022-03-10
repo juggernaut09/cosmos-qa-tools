@@ -1,8 +1,10 @@
 import argparse
+from cmath import e
 import os
 import subprocess
 import sys
 import shutil
+from tkinter import E
 
 from dotenv import load_dotenv
 from subprocess import check_output
@@ -80,8 +82,11 @@ for i in range(1, int(os.getenv('NODES')) + 1):
 print("-----Creating daemon home directories------")
 for i in range(1, int(os.getenv('NODES'))+1):
     print(f"****** create dir :: {os.getenv('DAEMON_HOME')}-{i} ********\n")
-    os.mkdir(f"{os.getenv('DAEMON_HOME')}-{i}")
-    os.mkdir(f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin")
+    try:
+        os.mkdir(f"{os.getenv('DAEMON_HOME')}-{i}")
+        os.makedirs(f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin")
+    except Exception as e:
+        sys.exit(e)
     shutil.copy(src=f"{shutil.which(os.getenv('DAEMON'))}", dst=f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin/")
 
 ### --------Start initializing the chain CHAINID ---------

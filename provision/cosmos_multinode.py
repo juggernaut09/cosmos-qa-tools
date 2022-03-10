@@ -143,7 +143,12 @@ for i in range(1, int(os.getenv('NODES')) + 1):
 ### "---------Copy all gentxs to $DAEMON_HOME-1----------"
 print(f"---------Copy all gentxs to {os.getenv('DAEMON_HOME')}-1----------")
 for i in range(2, int(os.getenv('NODES')) + 1):
-    shutil.copy(f"{os.getenv('DAEMON_HOME')}-{i}/config/gentx/*.json", f"{os.getenv('DAEMON_HOME')}-1/config/gentx/")
+    source_directory_path = f"{os.getenv('DAEMON_HOME')}-{i}/config/gentx"
+    destination_directory_path = f"{os.getenv('DAEMON_HOME')}-1/config/gentx"
+    for source_filename in os.listdir(source_directory_path):
+        if source_filename.endswith(".json"):
+            source_file_path = os.path.join(source_directory_path, source_filename)
+            shutil.copy(source_file_path, destination_directory_path)
 
 ### "----------collect-gentxs------------"
 subprocess.run([f"{os.getenv('DAEMON')}", 'collect-gentxs', '--home', f"{os.getenv('DAEMON_HOME')}-1"])

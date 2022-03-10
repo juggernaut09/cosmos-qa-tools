@@ -85,8 +85,10 @@ for i in range(1, int(os.getenv('NODES'))+1):
     try:
         os.mkdir(f"{os.getenv('DAEMON_HOME')}-{i}")
         os.makedirs(f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin")
-    except Exception as e:
-        sys.exit(e)
+    except FileExistsError as e:
+        print(e)
+    except FileNotFoundError as e:
+        sys.exit(e) 
     shutil.copy(src=f"{shutil.which(os.getenv('DAEMON'))}", dst=f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/genesis/bin/")
 
 ### --------Start initializing the chain CHAINID ---------

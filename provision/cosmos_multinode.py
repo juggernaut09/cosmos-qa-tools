@@ -170,3 +170,42 @@ if not IP:
     IP = "127.0.0.1"
 
 print(f"IP : {IP}")
+
+### Arranging PERSISTENT_PEERS
+
+print("-------Arranging PERSISTENT_PEERS---------")
+for i in range(1, int(os.getenv('NODES')) + 1):
+    DIFF = i - 1
+    INC = DIFF * 2
+    LADDR = 16656 + INC
+    print(f"----------Get node-id of {os.getenv('DAEMON_HOME')}-$a ---------")
+    encoded_nodeid = check_output([f"{os.getenv('DAEMON')}", 'tendermint', 'show-node-id', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
+    nodeID = encoded_nodeid.strip().decode()
+    print(f"** Node ID :: {nodeID} **")
+    PR=f"{nodeID}@{IP}:{LADDR}"
+    if i == 1:
+        PERSISTENT_PEERS=f"{PR}"
+        continue
+    PERSISTENT_PEERS=f"{PERSISTENT_PEERS},{PR}"
+
+###updating config.toml
+print("--------updating config.toml----------")
+for i in range(1, int(os.getenv('NODES')) + 1):
+    DIFF = i - 1
+    INC = DIFF * 2
+    RPC = 16657 + INC
+    LADDR = 16656 + INC
+    GRPC = 9090 + INC
+    WGRPC = 9091 + INC
+    print(f"----------Updating {os.getenv('DAEMON_HOME')}-{i} chain config-----------")
+    subprocess.run(['sed', '-i', f"s#tcp://127.0.0.1:26657#tcp://0.0.0.0:'{RPC}'#g", f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', f"s#tcp://0.0.0.0:26656#tcp://0.0.0.0:'{LADDR}'#g", f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', f"/persistent_peers =/c\persistent_peers = \"'\"{PERSISTENT_PEERS}\"'\"", f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', '/allow_duplicate_ip =/c\allow_duplicate_ip = true',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', '/pprof_laddr =/c\# pprof_laddr = "localhost:6060"',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', f"s#0.0.0.0:9090#0.0.0.0:'{GRPC}'#g",  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', f"s#0.0.0.0:9091#0.0.0.0:'{WGRPC}'#g",  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', '/max_num_inbound_peers =/c\max_num_inbound_peers = 140',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+    subprocess.run(['sed', '-i', '/max_num_outbound_peers =/c\max_num_outbound_peers = 110',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
+
+print("Updated the configuration files")

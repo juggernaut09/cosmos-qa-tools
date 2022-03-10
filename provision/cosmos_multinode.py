@@ -249,7 +249,7 @@ WantedBy=multi-user.target"""
 print("-------------Taking time to initialize the chains-----------\n")
 time.sleep(30)
 
-for i in range(i, int(os.getenv('NODES')) + 1):
+for i in range(1, int(os.getenv('NODES')) + 1):
     DIFF = i - 1
     INC = DIFF * 2
     RPC = 16657 + INC

@@ -217,15 +217,6 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     INC = DIFF * 2
     RPC = 16657 + INC
     print(f"---------Creating {os.getenv('DAEMON_HOME')}-{i} system file---------")
-    # bash_object = open(f"/lib/systemd/system/{os.getenv('DAEMON')}-{i}.service", 'a')
-    # bash_object.write("[unit]\n")
-    # bash_object.write(f"Description={os.getenv('DAEMON')} daemon\n")
-    # bash_object.write("After=network.target\n")
-    # bash_object.write("[Service]\n")
-    # bash_object.write(f"Environment=\"DAEMON_HOME={os.getenv('DAEMON_HOME')}-{i}\"\n")
-    # bash_object.write(f"Environment=\"DAEMON_NAME={os.getenv('DAEMON')}\"\n")
-    # bash_object.write('Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"')
-    # bash_object.write()
     service_file = f"""
 [Unit]
 Description={os.getenv('DAEMON')} daemon

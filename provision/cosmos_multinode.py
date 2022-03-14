@@ -70,16 +70,14 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     print(f"****** here command {os.getenv('DAEMON')} unsafe-reset-all  --home {os.getenv('DAEMON_HOME')}-{i} ******")
 
 ### Remove the all system services if already running
-print(f"--------- Remove the all system services running on {os.getenv('DAEMON')} if already running. -------------")
+print(f"--------- Checking the existing system services running on {os.getenv('DAEMON')}. -------------")
 directory_path = "/lib/systemd/system"
 for file in os.listdir(directory_path):
-    if file.startswith(f"{os.getenv('DAEMON')}"):
-        status = int(os.system(f"systemctl status {file}"))
-        if not status:
-            os.system(f"systemctl stop {file}")
-            os.system(f"systemctl disable {file}")
-            os.remove(os.path.join(directory_path, file))
-            print(f"Removed {file} ")
+    if file.startswith(f"{os.getenv('DAEMON')}") and os.system(f"systemctl is-active {file}") == "active":
+        os.system(f"systemctl stop {file}")
+        os.system(f"systemctl disable {file}")
+        os.remove(os.path.join(directory_path, file))
+        print(f"Removed {file} ")
 
 ### remove daemon home directories if it already exists
 for i in range(1, int(os.getenv('NODES')) + 1):

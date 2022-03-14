@@ -20,17 +20,15 @@ def node_type(x):
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes should be Min. 2 should be given')
 
 args = parser.parse_args()
-print("**** Number of nodes mentioned: %d *****" % args.nodes)
+print(f"**** Number of nodes mentioned: {args.nodes} *****\n")
 
-url = 'https://ipinfo.io/json'
-resp = req.get(url)
-l = json.loads(resp.text)
-IP = l["ip"]
+resp = req.get('https://ipinfo.io/ip')
+IP = resp.text
 
-if not len(IP):
-    IP='127.0.0.1'
+if not IP:
+     IP='127.0.0.1'
 
-print("---------- Run withdraw rewards tx -------")
+print("---------- Run withdraw rewards tx -------\n")
 
 DAEMON = os.getenv('DAEMON')
 DAEMON_HOME= os.getenv('DAEMON_HOME')
@@ -46,7 +44,7 @@ for a in range(1,args.nodes+1):
     output, error = process.communicate()
     res = (json.loads(output))
     VALADDRESS = res["address"]
-    FROMKEY = "validator"+str(a)
+    FROMKEY = f"validator{a}"
     print(f"** validator address :: {VALADDRESS} and From key :: {FROMKEY} **")
     print(f"Iteration no {a} and values of address : {VALADDRESS} and key : {FROMKEY}")
     print(f"--------- withdraw-rewards of {FROMKEY} -----------")
@@ -65,10 +63,11 @@ for a in range(1,args.nodes+1):
     wrCode = res["code"]
     reason = res["raw_log"]
     if wrCode == 0:
-        print(f"**** withdraw-rewards of {VALADDRESS} and key {FROMKEY} is successfull!! txHash is : {wrtxHash} *****")
+        print(f"**** withdraw-rewards of {VALADDRESS} and key {FROMKEY} is successfull!! txHash is : {wrtxHash} *****\n")
     else:
-        print(f"**** withdraw-rewards of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wrtxHash} and REASON : {reason} ****")
-print("-----------Run withdraw-rewards commission txs ----------")
+        print(f"**** withdraw-rewards of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wrtxHash} and REASON : {reason} ****\n")
+
+print("-----------Run withdraw-rewards commission txs ----------\n")
 for a in range(1,args.nodes+1):
     DIFF = a-1
     INC = DIFF*2
@@ -99,12 +98,12 @@ for a in range(1,args.nodes+1):
     wrcCode = res["code"]
     reason = res["raw_log"]
     if wrcCode == 0:
-        print(f"**** withdraw-rewards commission of {VALADDRESS}and key {FROMKEY} is successfull!! txHash is : {wrctxHash} *****")
+        print(f"**** withdraw-rewards commission of {VALADDRESS}and key {FROMKEY} is successfull!! txHash is : {wrctxHash} *****\n")
     else:
-        print(f"**** withdraw-rewards commission of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wrctxHash} and REASON: {reason} ****")
+        print(f"**** withdraw-rewards commission of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wrctxHash} and REASON: {reason} ****\n")
     
-print("--------- Run withdraw-all-rewards tx -----------")
 
+print("--------- Run withdraw-all-rewards tx -----------\n")
 for a in range(1,args.nodes+1):
     DIFF = a-1
     INC = DIFF*2
@@ -134,7 +133,7 @@ for a in range(1,args.nodes+1):
     warcode = res["code"]
     reason = res["raw_log"]
     if warcode == 0:
-        print(f"**** withdraw-all-rewards of {VALADDRESS} and key {FROMKEY} is successfull!! txHash is : {wartxHash} *****")
+        print(f"**** withdraw-all-rewards of {VALADDRESS} and key {FROMKEY} is successfull!! txHash is : {wartxHash} *****\n")
     else:
-        print(f"**** withdraw-all-rewards of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wartxHash} and REASON : {reason} ****")
+        print(f"**** withdraw-all-rewards of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wartxHash} and REASON : {reason} ****\n")
 

@@ -21,17 +21,15 @@ args = parser.parse_args()
 
 os.environ['NODES'] = str(args.nodes)
 
-print("**** Number of nodes to be paused: %d *****" % args.nodes)
+print(f"**** Number of nodes to be paused: {args.nodes} *****")
 
 print("--------- Stopping systemd service files -------")
 daemon = os.getenv('DAEMON')
 for a in range(1,args.nodes+1):
-      id = f"{daemon}-{a}.service"
-      cmd = f"sudo -S systemctl stop {id}"
-      process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-      output, error = process.communicate()
-      returncode = process.wait()
-      print(f"---- Stopped  {id}--------")
+    cmd = f"sudo -S systemctl stop {daemon}-{a}.service"
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    process.communicate()
+    print(f"---- Stopped {daemon}-{a}.service--------")
       
 
 

@@ -1,6 +1,5 @@
 import os
 import argparse
-import sys
 import requests as req
 import json
 
@@ -19,16 +18,14 @@ def node_type(x):
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes for status check. Min. 1 should be given')
 
 args = parser.parse_args()
-print("**** Number of nodes for status checks: %d" % args.nodes)
+print(f"**** Number of nodes for status checks: {args.nodes} ********")
 
 os.environ['NODES'] = str(args.nodes)
 
-url = 'https://ipinfo.io/json'
-resp = req.get(url)
-l = json.loads(resp.text)
-IP = l["ip"]
+resp = req.get('https://ipinfo.io/ip')
+IP = resp.text
 
-if not len(IP):
+if not IP:
      IP='127.0.0.1'
 
 print("------- Query node status -------")

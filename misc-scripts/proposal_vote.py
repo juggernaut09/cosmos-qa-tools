@@ -1,9 +1,5 @@
-from distutils.debug import DEBUG
 import os
 import argparse
-import re
-from tabnanny import check
-from xml.etree.ElementTree import PI
 import requests as req
 import json
 import subprocess
@@ -25,15 +21,13 @@ parser.add_argument('nodes', type= node_type, help= 'Number of nodes should be M
 
 args = parser.parse_args()
 
-print("--------- No.of validators who have to vote on the proposal : %d" % args.nodes)
+print(f"****** No.of validators who have to vote on the proposal : {args.nodes} ******")
 
-url = 'https://ipinfo.io/json'
-resp = req.get(url)
-l = json.loads(resp.text)
-IP = l["ip"]
+resp = req.get('https://ipinfo.io/ip')
+IP = resp.text
 
-if not len(IP):
-    IP='127.0.0.1'
+if not IP:
+     IP='127.0.0.1'
 
 print("--------Get voting period proposals--------------")
 DAEMON = os.getenv('DAEMON')
@@ -59,7 +53,7 @@ else:
     for row in pres:
         for i in row:
             PID = row["proposal_id"]
-            print(f"** Checking votes for proposal id : {PID} **")
+            print(f"** Checking votes for proposal id : {PID} **\n")
             for a in range(1,args.nodes+1):
                 DIFF = a-1
                 INC = DIFF*2
@@ -95,11 +89,11 @@ else:
                     reason = res["raw_log"]
                     if checkVote != "":
                         if checkVote == 0:
-                            print(f"**** {FROMKEY} successfully voted on the proposal :: (proposal ID : {PID} and address {VOTER})!! txHash is : {txHash}*****")
+                            print(f"**** {FROMKEY} successfully voted on the proposal :: (proposal ID : {PID} and address {VOTER})!! txHash is : {txHash}*****\n")
                         else:
-                            print(f"**** {FROMKEY} getting error while casting vote for ( Proposl ID : {PID} and address {VOTER})!!! txHash is : {txHash} and REASON : {reason} ****")
+                            print(f"**** {FROMKEY} getting error while casting vote for ( Proposl ID : {PID} and address {VOTER})!!! txHash is : {txHash} and REASON : {reason} ****\n")
                     else:
-                        print(f"Error while getting votes of proposal ID : {PID} from {FROMKEY} address: {VOTER}")
+                        print(f"Error while getting votes of proposal ID : {PID} from {FROMKEY} address: {VOTER}\n")
 
 
 

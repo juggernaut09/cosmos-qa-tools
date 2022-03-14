@@ -20,14 +20,13 @@ args = parser.parse_args()
 
 os.environ['NODES'] = str(args.nodes)
 
-print("**** Number of nodes to be resumed: %d *****" % args.nodes)
+print(f"**** Number of nodes to be resumed: {args.nodes} *****")
 
 print("---------- Restarting systemd service files ---------")
-d = os.getenv('DAEMON')
+DAEMON = os.getenv('DAEMON')
 for a in range(1,args.nodes+1):
-      id = f"{d}-{a}.service"
-      cmd = f"sudo -S systemctl restart {id}"
-      process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-      output, error = process.communicate()
-      print(f"---- Restarted  {id}--------")
+    cmd = f"sudo -S systemctl restart {DAEMON}-{a}.service"
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    process.communicate()
+    print(f"---- Restarted {DAEMON}-{a}.service--------")
 

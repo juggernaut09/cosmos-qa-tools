@@ -18,35 +18,32 @@ def node_type(x):
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be shutdown. Min. 1 should be given')
 
 args = parser.parse_args()
-print("**** Number of nodes to be shutdown and disabled: %d *****" % args.nodes)
+print(f"**** Number of nodes to be shutdown and disabled: {args.nodes} *****")
 
 print("---------- Stopping systemd service files ------------")
 
 daemon = os.getenv('DAEMON')
 
 for a in range(1,args.nodes+1):
-    id = f"{daemon}-{a}.service"
-    cmd = f"sudo -S systemctl stop {id}"
+    cmd = f"sudo -S systemctl stop {daemon}-{a}.service"
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    print(f"---- Stopped  {id}--------")
+    process.communicate()
+    print(f"---- Stopped {daemon}-{a}.service--------\n")
 
-print("-------- Running unsafe reset all -----------")
+print("-------- Running unsafe reset all ----------\n")
 for a in range(1,args.nodes+1):
-    id = f"{daemon}-{a}.service"
-    rescmd = f"{daemon} unsafe-reset-all --home {id}"
+    rescmd = f"{daemon} unsafe-reset-all --home {daemon}-{a}.service"
     process = subprocess.Popen(rescmd.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
+    process.communicate()
     
-    cmd = f"rm -rf {id}"
+    cmd = f"rm -rf {daemon}-{a}.service"
     proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-    out, error = proc.communicate()
+    proc.communicate()
+    print(f"--- Executed {daemon} unsafe-reset-all --home {daemon}-{a}.service ---\n")
     
-    print(f"--- Executed {daemon} unsafe-reset-all --home {id} ---")
-print("------- Disabling systemd process files -------")
+print("------- Disabling systemd process files -------\n")
 for a in range(1,args.nodes+1):
-    id = f"{daemon}-{a}.service"
-    cmd = f"sudo -S systemctl disable {id}"
+    cmd = f"sudo -S systemctl disable {daemon}-{a}.service"
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    print(f"-- Executed sudo -S systemctl disable {id} --")
+    process.communicate()
+    print(f"-- Executed sudo -S systemctl disable {daemon}-{a}.service --\n")

@@ -1,6 +1,5 @@
 import os
 import argparse
-from re import T
 import requests as req
 import json
 import subprocess
@@ -21,17 +20,15 @@ def node_type(x):
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes should be Min. 2 should be given')
 
 args = parser.parse_args()
-print("**** Number of nodes mentioned: %d *****" % args.nodes)
+print(f"**** Number of nodes mentioned: {args.nodes} *****")
 
-url = 'https://ipinfo.io/json'
-resp = req.get(url)
-l = json.loads(resp.text)
-IP = l["ip"]
+resp = req.get('https://ipinfo.io/ip')
+IP = resp.text
 
-if not len(IP):
-    IP='127.0.0.1'
+if not IP:
+     IP='127.0.0.1'
 
-print("------------Delegation tx----------------")
+print("------------Delegation tx----------------\n")
 DAEMON = os.getenv('DAEMON')
 DAEMON_HOME= os.getenv('DAEMON_HOME')
 CHAINID = os.getenv('CHAINID')
@@ -47,9 +44,8 @@ for a in range(1,args.nodes):
     output, error = process.communicate()
     res = (json.loads(output))
     VALADDRESS = res["address"]
-    FROMKEY = "validator"+str(a)
-    TO = VALADDRESS
-    TOKEY = f"validator{TONODE}"
+    FROMKEY = "validator{a}"
+    TO, TOKEY = VALADDRESS,f"validator{TONODE}"
     print(f"** to validator address :: {TO} and from key :: {FROMKEY} **")
     print (f"Iteration no {a} and values of from : {FROMKEY} to : {TO}")
     print(f"--------- Delegation from {FROMKEY} to {TO}-----------")
@@ -67,11 +63,11 @@ for a in range(1,args.nodes):
     dTxCode = res["code"]
     reason = res["raw_log"]
     if dTxCode == 0:
-        print(f"**** Delegation from {FROMKEY} to {TOKEY} is SUCCESSFULL!!  txHash is : {dtxHash} ****")
+        print(f"**** Delegation from {FROMKEY} to {TOKEY} is SUCCESSFULL!!  txHash is : {dtxHash} ****\n")
     else:
-        print(f"**** Delegation from {FROMKEY} to {TOKEY} has FAILED!!!!   txHash is : {dtxHash} and REASON : {reason}")
+        print(f"**** Delegation from {FROMKEY} to {TOKEY} has FAILED!!!!   txHash is : {dtxHash} and REASON : {reason}\n")
     
-print(f"-----------Redelegation txs-------------")
+print(f"-----------Redelegation txs-------------\n")
 for a in range(args.nodes,0,-1):
     if a == 1:
         N = args.nodes
@@ -112,8 +108,8 @@ for a in range(args.nodes,0,-1):
         TOKEY = f"validator{TONODE}"
         print(f"** validator address :: {VALADDRESS} and from key :: {FROMKEY} **")
 
-    print(f"Iteration no {a} and values of from : {FROMKEY} to : {TOKEY}")
-    print(f"--------- Redelegation from {FROM} to {TO}-----------")
+    print(f"Iteration no {a} and values of from : {FROMKEY} to : {TOKEY}\n")
+    print(f"--------- Redelegation from {FROM} to {TO}-----------\n")
     rdTx = f"{DAEMON} tx staking redelegate {FROM} {TO} 10000{DENOM} --from {FROMKEY} --fees 1000{DENOM} --gas 400000 --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-{a} --node {RPC} --output json -y"
     process = subprocess.Popen(rdTx.split(), stdout=subprocess.PIPE, text=True)
     output, error = process.communicate()
@@ -132,11 +128,11 @@ for a in range(args.nodes,0,-1):
         rdTxCode = res["code"]
         reason = res["raw_log"]
         if rdTxCode == 0:
-            print(f"**** Redelegation from {FROMKEY} to {TOKEY} is SUCCESSFULL!!  txHash is : {rdtxHash} ****")
+            print(f"**** Redelegation from {FROMKEY} to {TOKEY} is SUCCESSFULL!!  txHash is : {rdtxHash} ****\n")
         else:
-            print(f"**** Redelegation from {FROMKEY} to {TOKEY} has FAILED!!!!  txHash is : {rdtxHash} and REASON : {reason}")
+            print(f"**** Redelegation from {FROMKEY} to {TOKEY} has FAILED!!!!  txHash is : {rdtxHash} and REASON : {reason}\n")
 
-print("--------- Unbond txs -----------")
+print("--------- Unbond txs -----------\n")
 for a in range(1,args.nodes):
     DIFF = a-1
     INC = DIFF*2
@@ -167,6 +163,6 @@ for a in range(1,args.nodes):
     reason = res["raw_log"]
 
     if ubTxCode == 0:
-        print(f"**** Unbond tx ( of {FROM} and key {FROMKEY} ) is SUCCESSFULL!!  txHash is : {ubtxHash} ****")
+        print(f"**** Unbond tx ( of {FROM} and key {FROMKEY} ) is SUCCESSFULL!!  txHash is : {ubtxHash} ****\n")
     else:
-        print(f"**** Unbond tx ( of {FROM} and key {FROMKEY} ) FAILED!!!!   txHash is : {ubtxHash}  and REASON : {reason} ***")
+        print(f"**** Unbond tx ( of {FROM} and key {FROMKEY} ) FAILED!!!!   txHash is : {ubtxHash}  and REASON : {reason} ***\n")

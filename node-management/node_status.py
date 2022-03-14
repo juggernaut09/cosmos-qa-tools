@@ -35,8 +35,13 @@ for a in range(1,args.nodes+1):
     PORT = 16657 + INC
     RPC = f"http://{IP}:{PORT}/status?"
     res = req.get(RPC)
-    result = json.loads(res.text)
-    height = result["result"]["sync_info"]["latest_block_height"]
-    syncStatus = result["result"]["sync_info"]["catching_up"]
-    print(f"** rpc: {RPC} latest_block_height: {height} catching_up: {syncStatus}")
+    try:
+       result = json.loads(res.text)
+       height = result["result"]["sync_info"]["latest_block_height"]
+       syncStatus = result["result"]["sync_info"]["catching_up"]
+       print(f"** rpc: {RPC} latest_block_height: {height} catching_up: {syncStatus}")
+    except ValueError as e:
+        print(e)
+
+    
     

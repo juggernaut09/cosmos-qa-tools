@@ -4,7 +4,7 @@ import subprocess
 import sys
 import shutil
 import requests
-import time
+
 
 from dotenv import load_dotenv
 from subprocess import check_output
@@ -68,6 +68,17 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     os.environ[f'DAEMON_HOME_{i}'] = f"{os.getenv('DAEMON_HOME')}-{i}"
     print(f"Deamon path :: {os.getenv('DAEMON_HOME')}-{i}\n")
     print(f"****** here command {os.getenv('DAEMON')} unsafe-reset-all  --home {os.getenv('DAEMON_HOME')}-{i} ******")
+
+### Remove the all system services if already running
+print(f"--------- Remove the all system services running on {os.getenv('DAEMON')} if already running. -------------")
+directory_path = "/lib/systemd/system"
+for file in os.listdir(directory_path):
+    if file.startswith(f"{os.getenv('DAEMON')}"):
+        if not int(os.system(f"systemctl status {file}")):
+            os.system(f"systemctl stop {file}")
+            os.system(f"systemctl disable {file}")
+            os.remove(os.path.join(directory_path, file))
+            print(f"Removed {file} ")
 
 ### remove daemon home directories if it already exists
 for i in range(1, int(os.getenv('NODES')) + 1):

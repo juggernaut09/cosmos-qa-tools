@@ -44,6 +44,8 @@ deactivate  # don't exit until you're done using dependencies.
 
 ## Make sure to import env values in .env file
 
+> Note: .env file is not included. The file should be created. (Take below format as reference.)
+
 ```bash
 DAEMON=gaiad
 DENOM=uatom
@@ -51,4 +53,14 @@ CHAINID=test
 DAEMON_HOME=~/.gaiad
 GH_URL=https://github.com/cosmos/gaia
 CHAIN_VERSION=v6.0.3
+```
+
+## Scripts:-
+
+1. `cosmos_multinode.py` :- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created.
+
+2. Usage:-
+
+```bash
+python3 provision/cosmos_multinode.py --help
 ```

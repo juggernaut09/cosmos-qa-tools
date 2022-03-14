@@ -74,7 +74,8 @@ print(f"--------- Remove the all system services running on {os.getenv('DAEMON')
 directory_path = "/lib/systemd/system"
 for file in os.listdir(directory_path):
     if file.startswith(f"{os.getenv('DAEMON')}"):
-        if not int(os.system(f"systemctl status {file}")):
+        status = int(os.system(f"systemctl status {file}"))
+        if not status:
             os.system(f"systemctl stop {file}")
             os.system(f"systemctl disable {file}")
             os.remove(os.path.join(directory_path, file))

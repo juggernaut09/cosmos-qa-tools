@@ -243,7 +243,7 @@ Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
 Environment="UNSAFE_SKIP_BACKUP=false"
 Type=simple
 User={os.getenv('USER')}
-ExecStart={shutil.which('cosmovisor')} start --home {os.getenv('DAEMON_HOME')}-{i}
+ExecStart={shutil.which('cosmovisor')} start --home {os.getenv('DAEMON_HOME')}-{i} &
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65536

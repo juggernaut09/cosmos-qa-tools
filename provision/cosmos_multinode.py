@@ -74,7 +74,8 @@ print(f"--------- Checking the existing system services running on {os.getenv('D
 directory_path = "/lib/systemd/system"
 for file in os.listdir(directory_path):
     if file.startswith(f"{os.getenv('DAEMON')}"):
-        status = os.system(f"systemctl is-active {file}")
+        status = f"systemctl is-active {file}"
+        status = subprocess.check_output(status.split()).strip().decode()
         if status == 'active':
             os.system(f"systemctl stop {file}")
             os.system(f"systemctl disable {file}")

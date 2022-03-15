@@ -74,13 +74,10 @@ print(f"--------- Checking the existing system services running on {os.getenv('D
 directory_path = "/lib/systemd/system"
 for file in os.listdir(directory_path):
     if file.startswith(f"{os.getenv('DAEMON')}"):
-        status = f"systemctl is-active {file}"
-        status = subprocess.check_output(status.split()).strip().decode()
-        if status == 'active':
-            os.system(f"systemctl stop {file}")
-            os.system(f"systemctl disable {file}")
-            os.remove(os.path.join(directory_path, file))
-            print(f"Removed {file} ")
+        os.system(f"systemctl stop {file}")
+        os.system(f"systemctl disable {file}")
+        os.remove(os.path.join(directory_path, file))
+        print(f"Removed {file} ")
 
 ### remove daemon home directories if it already exists
 for i in range(1, int(os.getenv('NODES')) + 1):

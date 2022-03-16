@@ -16,7 +16,7 @@ def node_type(x):
     return x
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
-parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be created. Min. 2 should be given')
+parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be upgraded. Min. 2 should be given')
 args = parser.parse_args()
 print(f" ** Number of nodes : {args.nodes} to be upgraded **")
 os.environ['NODES'] = str(args.nodes)
@@ -27,7 +27,7 @@ if not os.getenv('GH_URL'):
     sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
 
 os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
-os.rmdir(f"{os.getenv('REPO')}")
+shutil.rmtree(f"{os.getenv('REPO')}")
 subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
 os.chdir(f"{os.getenv('REPO')}")
 subprocess.run(['git', 'fetch'])

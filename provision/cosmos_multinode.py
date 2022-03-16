@@ -60,7 +60,7 @@ else:
     subprocess.run(['git', 'checkout', f"{os.getenv('CHAIN_VERSION')}"])
     subprocess.run(['make', 'install'])
     
-os.chdir(os.path.expanduser('~'))
+os.chdir(os.path.expanduser(os.getenv('HOME')))
 subprocess.run([f"{os.getenv('DAEMON')}", 'version', '--long']) # check DAEMON version
 
 ### export daemon home paths
@@ -80,12 +80,18 @@ for file in os.listdir(directory_path):
         print(f"Removed {file} ")
 
 ### remove daemon home directories if it already exists
-for i in range(1, int(os.getenv('NODES')) + 1):
-    try:
-        shutil.rmtree(f"{os.getenv('DAEMON_HOME')}-{i}")
-        print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
-    except FileNotFoundError:
-        print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")
+
+# for i in range(1, int(os.getenv('NODES')) + 1):
+#     try:
+#         shutil.rmtree(f"{os.getenv('DAEMON_HOME')}-{i}")
+#         print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
+#     except FileNotFoundError:
+#         print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")
+
+for file in os.listdir(os.getenv('HOME')):
+    if file.startswith(f".{os.getenv('REPO')}"):
+        print(f"------ Deleteing {file} directory ------")
+        shutil.rmtree(file)
 
 
 ### Creating daemon home directories

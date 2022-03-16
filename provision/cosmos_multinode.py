@@ -71,9 +71,10 @@ for i in range(1, int(os.getenv('NODES')) + 1):
 
 ### Remove the all system services if already running
 print(f"--------- Checking the existing system services running on {os.getenv('DAEMON')}. -------------")
+service_files = [f"{os.getenv('DAEMON')}-{i}.service" for i in range(1, int(os.getenv('NODES')) + 1)]
 directory_path = "/lib/systemd/system"
 for file in os.listdir(directory_path):
-    if file.startswith(f"{os.getenv('DAEMON')}"):
+    if file in service_files:
         os.system(f"systemctl stop {file}")
         os.system(f"systemctl disable {file}")
         os.remove(os.path.join(directory_path, file))
@@ -81,17 +82,13 @@ for file in os.listdir(directory_path):
 
 ### remove daemon home directories if it already exists
 
-# for i in range(1, int(os.getenv('NODES')) + 1):
-#     try:
-#         shutil.rmtree(f"{os.getenv('DAEMON_HOME')}-{i}")
-#         print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
-#     except FileNotFoundError:
-#         print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")
+for i in range(1, int(os.getenv('NODES')) + 1):
+    try:
+        shutil.rmtree(f"{os.getenv('DAEMON_HOME')}-{i}")
+        print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
+    except FileNotFoundError:
+        print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")
 
-for file in os.listdir(os.getenv('HOME')):
-    if file.startswith(f".{os.getenv('REPO')}"):
-        print(f"------ Deleteing {file} directory ------")
-        shutil.rmtree(file)
 
 
 ### Creating daemon home directories

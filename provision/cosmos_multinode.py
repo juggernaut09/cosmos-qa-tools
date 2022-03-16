@@ -192,7 +192,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     DIFF = i - 1
     INC = DIFF * 2
     LADDR = 16656 + INC
-    print(f"----------Get node-id of {os.getenv('DAEMON_HOME')}-$a ---------")
+    print(f"----------Get node-id of {os.getenv('DAEMON_HOME')}-{i} ---------")
     encoded_nodeid = check_output([f"{os.getenv('DAEMON')}", 'tendermint', 'show-node-id', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
     nodeID = encoded_nodeid.strip().decode()
     print(f"** Node ID :: {nodeID} **")
@@ -230,7 +230,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     DIFF = i - 1
     INC = DIFF * 2
     RPC = 16657 + INC
-    print(f"---------Creating {os.getenv('DAEMON_HOME')}-{i} system file---------")
+    print(f"---------Creating /lib/systemd/system/{os.getenv('DAEMON')}-{i}.service system file---------")
     service_file = f"""
 [Unit]
 Description={os.getenv('DAEMON')} daemon

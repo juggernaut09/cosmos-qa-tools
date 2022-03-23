@@ -49,7 +49,7 @@ def balance_query(bech_address, RPC):
     command = f"{os.getenv('DAEMON')} q bank balances {bech_address} --node {RPC} --output json" 
     return command_processor(command)
 
-#### Fetching Balance from accounts ######
+#### Fetching Bech addresses ######
 RPC = "http://127.0.0.1:16657"
 num_msgs = 30
 
@@ -90,16 +90,54 @@ if len(seq2err):
 seq2 = json.loads(seq2)
 seq2no = seq2['sequence']
 
+def write_json(file_name):
+    with open(file_name, 'r+') as file:
+            file_data = json.load(file)
+            new_data = file_data["body"]["messages"][-1]
+            file_data["body"]["messages"].append(new_data)
+            file.seek(0)
+            json.dump(file_data, file, indent = 4)
 
+for i in range(0, int(num_txs) + 1):
+    unsignedTxto_command = f"{os.getenv('DAEMON')} tx bank send {acc1} {acc2} 1000000{os.getenv('DENOM')} --chain-id {os.getenv('CHAINID')} --output json --generate-only --gas 500000"
+    unsignedTxto, unsignedTxtoerr = command_processor(unsignedTxto_command)
+    if len(unsignedTxtoerr):
+        sys.exit(unsignedTxtoerr) 
+    with open('unsignedto.json', 'w') as outfile:
+        json.dump(json.loads(unsignedTxto), outfile)
+    
+    unsignedTxfrom_command = f"{os.getenv('DAEMON')} tx bank send {acc2} {acc1} 1000000{os.getenv('DENOM')} --chain-id {os.getenv('CHAINID')} --output json --generate-only --gas 500000"
+    unsignedTxfrom, unsignedTxfromerr = command_processor(unsignedTxfrom_command)
+    if len(unsignedTxfromerr):
+        sys.exit(unsignedTxfromerr)
+    with open('unsignedfrom.json', 'w') as outfile:
+        json.dump(json.loads(unsignedTxfrom), outfile)
+    
+    for j in range(0, int(num_msgs) + 1):
+        write_json('unsignedto.json')
+        write_json('unsignedfrom.json')
 
+    ### seqto ###
+    seqto = seq1no + i
+    signTxto_command = f"{os.getenv('DAEMON')} tx sign unsignedto.json --from {acc1} --chain-id {os.getenv('CHAINID')} --keyring-backend test --home {os.getenv('DAEMON_HOME')}-1 --node {RPC} --signature-only=false --sequence {seqto} --gas 500000"
+    signTxto, signTxtoerr = command_processor(signTxto_command)
+    if len(signTxtoerr):
+        sys.exit(signTxtoerr)
+    with open('signedto.json', 'w') as outfile:
+        json.dump(json.loads(signTxto), outfile)
+    print(json.loads(signTxto))
+    broadcastto_command = f"{os.getenv('DAEMON')} tx broadcast signedto.json --output json --chain-id {os.getenv('CHAINID')} --gas 500000 --node {RPC} --broadcast-mode async"
+    broadcastto, broadcasttoerr = command_processor(broadcastto_command)
+    if len(broadcasttoerr):
+        sys.exit(broadcasttoerr)
+    broadcastto = json.loads(broadcastto)
+    print(f"txhash: {broadcastto['txhash']}")
 
-
-
-
+    ### seqfrom ###
     
 
 
 
 
 
-
+    

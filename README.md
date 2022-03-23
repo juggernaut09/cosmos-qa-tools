@@ -44,7 +44,7 @@ deactivate  # don't exit until you're done using dependencies.
 
 ## Make sure to import env values in .env file
 
-> Note: .env file is not included. The file should be created. (Take below format as reference.)
+> Note: .env file is not included. The file should be created. (Take below format as reference or see the .env.example file)
 
 ```bash
 DAEMON=gaiad

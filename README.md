@@ -50,7 +50,7 @@ deactivate  # don't exit until you're done using dependencies.
 DAEMON=gaiad
 DENOM=uatom
 CHAINID=test
-DAEMON_HOME=~/.gaiad
+DAEMON_HOME=${HOME}/.gaiad
 GH_URL=https://github.com/cosmos/gaia
 CHAIN_VERSION=v6.0.3
 ```

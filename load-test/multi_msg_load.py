@@ -81,14 +81,14 @@ seq1, seq1err = command_processor(command)
 seq1 = json.loads(seq1)
 if len(seq1err):
     sys.exit(seq1err)
-seq1no = seq1['sequence']}
+seq1no = seq1['sequence']
 
 command = f"{os.getenv('DAEMON')} q account {acc2} --node {RPC} --output json"
 seq2, seq2err = command_processor(command)
 if len(seq2err):
     sys.exit(seq2err)
 seq2 = json.loads(seq2)
-seq2no = seq2['sequence']}
+seq2no = seq2['sequence']
 
 
 

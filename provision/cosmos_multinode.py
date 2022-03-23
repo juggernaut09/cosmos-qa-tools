@@ -5,7 +5,6 @@ import sys
 import shutil
 import requests
 
-
 from dotenv import load_dotenv
 from subprocess import check_output
 
@@ -23,9 +22,9 @@ def is_tool(binary):
     return which(binary) is not None
 
 ### Fetch NODES and ACCOUNTS values
-parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
-parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be created. Min. 2 should be given')
-parser.add_argument('accounts', type= int, help= 'Number of Accounts to be created. If not please enter 0')
+parser = argparse.ArgumentParser(description='This program takes inputs for setting up the required number of nodes.')
+parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be set up. Min. 2 should be given')
+parser.add_argument('accounts', type= int, help= 'Number of Accounts to be set up. If not please enter 0')
 args = parser.parse_args()
 print(f" ** Number of nodes : {args.nodes} and accounts : {args.accounts} to be setup **")
 os.environ['NODES'] = str(args.nodes)
@@ -41,12 +40,10 @@ else:
     subprocess.run(['go', 'install', 'github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0'])
 
 subprocess.run(['which', 'cosmovisor']) # Print the cosmovisor location
-
 if not os.getenv('GH_URL'):
-    sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
+    sys.exit('The environment varible \'GH_URL\' is not set. make sure to update the env values in .env file')
 
 os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
-
 
 ### DENOM Installation
 print(f"--------- Install {os.getenv('DAEMON')} ---------")
@@ -69,7 +66,7 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     print(f"Deamon path :: {os.getenv('DAEMON_HOME')}-{i}\n")
     print(f"****** here command {os.getenv('DAEMON')} unsafe-reset-all  --home {os.getenv('DAEMON_HOME')}-{i} ******")
 
-### Remove the all system services if already running
+### Remove the systemd services if they are already running ###
 print(f"--------- Checking the existing system services running on {os.getenv('DAEMON')}. -------------")
 service_files = [f"{os.getenv('DAEMON')}-{i}.service" for i in range(1, int(os.getenv('NODES')) + 1)]
 directory_path = "/lib/systemd/system"
@@ -80,16 +77,13 @@ for file in os.listdir(directory_path):
         os.remove(os.path.join(directory_path, file))
         print(f"Removed {file} ")
 
-### remove daemon home directories if it already exists
-
+### remove daemon home directories if it already exists ###
 for i in range(1, int(os.getenv('NODES')) + 1):
     try:
         shutil.rmtree(f"{os.getenv('DAEMON_HOME')}-{i}")
         print(f"Deleting existing daemon directory {os.getenv('DAEMON_HOME')}-{i}")
     except FileNotFoundError:
         print(f"The directory {os.getenv('DAEMON_HOME')}-{i} does not exists")
-
-
 
 ### Creating daemon home directories
 print("-----Creating daemon home directories------")
@@ -124,20 +118,20 @@ else:
     for i in range(1, int(os.getenv('ACCOUNTS')) + 1):
         subprocess.run([f"{os.getenv('DAEMON')}", 'keys', 'add', f"account{i}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-1"])
 
-### ----------Genesis creation---------
-print("----------Genesis creation---------")
+### ----------Adding genesis accounts--------- ###
+print("----------Adding genesis accounts---------")
 for i in range(1, int(os.getenv('NODES')) + 1):
     if i == 1:
         subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", f"1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
-        print(f"done {os.getenv('DAEMON_HOME')}-{i} genesis creation")
+        print(f"done {os.getenv('DAEMON_HOME')}-{i} genesis allocation")
         continue
     subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-{i}", 'add-genesis-account', f"validator{i}", f"1000000000000{os.getenv('DENOM')}", '--keyring-backend', 'test'])
     key_address = check_output([f"{os.getenv('DAEMON')}", 'keys', 'show', f"validator{i}", '-a', '--home', f"{os.getenv('DAEMON_HOME')}-{i}", '--keyring-backend', 'test'])
     address = key_address.strip().decode()
     subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", 'add-genesis-account', f"{address}", f"1000000000000{os.getenv('DENOM')}"])
-print(f"--------Genesis created for {os.getenv('NODES')} nodes-----------")
+print(f"--------Genesis allocation done for {os.getenv('NODES')} nodes-----------")
 
-### "----------Genesis creation for accounts---------"
+#### "----------Genesis allocation for accounts---------" ####
 
 if not int(os.getenv('ACCOUNTS')):
     print("----- Argument for accounts is not present, not creating any additional accounts --------")
@@ -147,10 +141,10 @@ else:
         address = key_address.strip().decode()
         print(f"cmd ::{os.getenv('DAEMON')} --home {os.getenv('DAEMON_HOME')}-1 add-genesis-account {address} 1000000000000{os.getenv('DENOM')}")
         subprocess.run([f"{os.getenv('DAEMON')}", '--home', f"{os.getenv('DAEMON_HOME')}-1", 'add-genesis-account', f"{address}", f"1000000000000{os.getenv('DENOM')}"])
-    print("----------Genesis created for accounts---------")
+    print("----------Genesis allocation done for accounts---------")
 
-### "--------Gentx--------"
-print("--------Gentx--------")
+#### "--------Gentx  creation--------" ####
+print("--------Gentx creation--------")
 for i in range(1, int(os.getenv('NODES')) + 1):
     subprocess.run([f"{os.getenv('DAEMON')}", 'gentx', f"validator{i}", f"90000000000{os.getenv('DENOM')}", '--chain-id', f"{os.getenv('CHAINID')}", '--keyring-backend', 'test', '--home', f"{os.getenv('DAEMON_HOME')}-{i}"])
 
@@ -184,10 +178,9 @@ if not IP:
     IP = "127.0.0.1"
 
 print(f"IP : {IP}")
+### Setting PERSISTENT_PEERS ###
 
-### Arranging PERSISTENT_PEERS
-
-print("-------Arranging PERSISTENT_PEERS---------")
+print("-------Setting PERSISTENT_PEERS---------")
 for i in range(1, int(os.getenv('NODES')) + 1):
     DIFF = i - 1
     INC = DIFF * 2
@@ -221,11 +214,9 @@ for i in range(1, int(os.getenv('NODES')) + 1):
     subprocess.run(['sed', '-i', f"s#0.0.0.0:9091#0.0.0.0:{WGRPC}#g",  f"{os.getenv('DAEMON_HOME')}-{i}/config/app.toml"])
     subprocess.run(['sed', '-i', '/max_num_inbound_peers =/c\max_num_inbound_peers = 140',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
     subprocess.run(['sed', '-i', '/max_num_outbound_peers =/c\max_num_outbound_peers = 110',  f"{os.getenv('DAEMON_HOME')}-{i}/config/config.toml"])
-
 print("Updated the configuration files")
 
 ### create system services
-
 for i in range(1, int(os.getenv('NODES')) + 1):
     DIFF = i - 1
     INC = DIFF * 2

@@ -6,11 +6,8 @@ import subprocess
 import time
 
 from dotenv import load_dotenv
-
 load_dotenv()
-
 parser = argparse.ArgumentParser()
-
 def node_type(x):
     x = int(x)
     if x < 2:
@@ -18,14 +15,11 @@ def node_type(x):
     return x
 
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes should be Min. 2 should be given')
-
 args = parser.parse_args()
-
 print(f"****** No.of validators who have to vote on the proposal : {args.nodes} ******")
 
 resp = req.get('https://ipinfo.io/ip')
 IP = resp.text
-
 if not IP:
      IP='127.0.0.1'
 
@@ -104,9 +98,3 @@ else:
                             print(e)
                 except ValueError as e:
                        print(e)
-
-
-
-
-
-                

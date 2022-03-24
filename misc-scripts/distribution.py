@@ -6,11 +6,8 @@ import subprocess
 import time
 
 from dotenv import load_dotenv
-
 load_dotenv()
-
 parser = argparse.ArgumentParser()
-
 def node_type(x):
     x = int(x)
     if x < 2:
@@ -18,18 +15,15 @@ def node_type(x):
     return x
 
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes should be Min. 2 should be given')
-
 args = parser.parse_args()
 print(f"**** Number of nodes mentioned: {args.nodes} *****\n")
 
 resp = req.get('https://ipinfo.io/ip')
 IP = resp.text
-
 if not IP:
      IP='127.0.0.1'
 
 print("---------- Run withdraw rewards tx -------\n")
-
 DAEMON = os.getenv('DAEMON')
 DAEMON_HOME= os.getenv('DAEMON_HOME')
 CHAINID = os.getenv('CHAINID')
@@ -77,6 +71,7 @@ for a in range(1,args.nodes+1):
                     print(f"**** withdraw-rewards of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wrtxHash} and REASON : {reason} ****\n")
             except ValueError as e:
                 print(f"{e}")
+
 print("-----------Run withdraw-rewards commission txs ----------\n")
 for a in range(1,args.nodes+1):
     DIFF = a-1
@@ -122,7 +117,6 @@ for a in range(1,args.nodes+1):
                     print(f"**** withdraw-rewards commission of {VALADDRESS} and key {FROMKEY} is failed!!! txHash is : {wrctxHash} and REASON: {reason} ****\n")
             except ValueError as e:
                 print(f"withdraw-rewards commission of {VALADDRESS} and key {FROMKEY} is failed!!! Reason is : {e}")
-
 
 print("--------- Run withdraw-all-rewards tx -----------\n")
 for a in range(1,args.nodes+1):

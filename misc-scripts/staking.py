@@ -6,11 +6,8 @@ import subprocess
 import time
 
 from dotenv import load_dotenv
-
 load_dotenv()
-
 parser = argparse.ArgumentParser()
-
 def node_type(x):
     x = int(x)
     if x < 2:
@@ -18,13 +15,11 @@ def node_type(x):
     return x
 
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes should be Min. 2 should be given')
-
 args = parser.parse_args()
 print(f"**** Number of nodes mentioned: {args.nodes} *****")
 
 resp = req.get('https://ipinfo.io/ip')
 IP = resp.text
-
 if not IP:
      IP='127.0.0.1'
 
@@ -73,6 +68,7 @@ for a in range(1,args.nodes):
                 print(f"**** Delegation from {FROMKEY} to {TOKEY} has FAILED!!!!   txHash is : {dtxHash} and REASON : {reason}\n")
     except ValueError as e:
         print(f"{e}")
+        
 print(f"-----------Redelegation txs-------------\n")
 for a in range(args.nodes,0,-1):
     if a == 1:

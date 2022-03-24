@@ -4,11 +4,8 @@ import requests as req
 import subprocess
 
 from dotenv import load_dotenv
-
 load_dotenv()
-
 parser = argparse.ArgumentParser()
-
 def node_type(x):
     x = int(x)
     if x < 1:
@@ -17,9 +14,7 @@ def node_type(x):
 
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be resumed. Min. 1 should be given')
 args = parser.parse_args()
-
 os.environ['NODES'] = str(args.nodes)
-
 print(f"**** Number of nodes to be resumed: {args.nodes} *****")
 
 print("---------- Restarting systemd service files ---------")
@@ -29,4 +24,3 @@ for a in range(1,args.nodes+1):
     process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
     process.communicate()
     print(f"---- Restarted {DAEMON}-{a}.service--------")
-

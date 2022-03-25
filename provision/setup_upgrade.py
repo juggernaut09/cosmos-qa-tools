@@ -4,10 +4,19 @@ import subprocess
 import sys
 import shutil
 
+from dotenv import dotenv_values
 
-from dotenv import load_dotenv
-
-load_dotenv()
+### Fetch env values
+config = dotenv_values(".env")
+DAEMON = config['DAEMON']
+DENOM = config['DENOM']
+CHAINID = config['CHAINID']
+DAEMON_HOME = config['DAEMON_HOME']
+GH_URL = config['GH_URL']
+CHAIN_VERSION = config['CHAIN_VERSION']
+UPGRADE_NAME = config['UPGRADE_NAME']
+UPGRADE_VERSION = config['UPGRADE_VERSION']
+HOME = config['HOME']
 
 def node_type(x):
     x = int(x)
@@ -23,20 +32,20 @@ os.environ['NODES'] = str(args.nodes)
 os.chdir(os.path.expanduser('~'))
 
 ### Build the upgrade version
-if not os.getenv('GH_URL'):
+if not GH_URL:
     sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
 
-os.environ['REPO'] = os.getenv('GH_URL').split('/')[-1]
+os.environ['REPO'] = GH_URL.split('/')[-1]
 shutil.rmtree(f"{os.getenv('REPO')}")
-subprocess.run(['git', 'clone', f"{os.getenv('GH_URL')}"])
+subprocess.run(['git', 'clone', f"{GH_URL}"])
 os.chdir(f"{os.getenv('REPO')}")
 subprocess.run(['git', 'fetch'])
-subprocess.run(['git', 'checkout', f"{os.getenv('UPGRADE_VERSION')}"])
+subprocess.run(['git', 'checkout', f"{UPGRADE_VERSION}"])
 subprocess.run(['make', 'build'])
 
 for i in range(1, int(os.getenv('NODES')) + 1):
-    os.environ[f"DAEMON_HOME_{i}"] = f"{os.getenv('DAEMON_HOME')}-{i}"
-    os.makedirs(f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/upgrades/{os.getenv('UPGRADE_NAME')}/bin")
-    shutil.copy(f"{os.getenv('HOME')}/{os.getenv('REPO')}/build/{os.getenv('DAEMON')}", f"{os.getenv('DAEMON_HOME')}-{i}/cosmovisor/upgrades/{os.getenv('UPGRADE_NAME')}/bin/")
+    os.environ[f"DAEMON_HOME_{i}"] = f"{DAEMON_HOME}-{i}"
+    os.makedirs(f"{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin")
+    shutil.copy(f"{HOME}/{os.getenv('REPO')}/build/{UPGRADE_NAME}", f"{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin/")
 
 print("-------- New upgraded binary is moved to cosmovisor ---------")

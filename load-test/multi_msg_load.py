@@ -56,17 +56,15 @@ parser.add_argument('TO', type= account_type, help= 'Reciever account number.')
 parser.add_argument('NUM_TXS', type = num_txs_type, help= 'Number of transactions to be made, Min. should be 1000')
 
 args = parser.parse_args()
-FROM = int(args.FROM)
-TO = int(args.TO)
-NUM_TXS = int(args.NUM_TXS)
+FROM, TO, NUM_TXS = int(args.FROM), int(args.TO), int(args.NUM_TXS)
 
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
 
-#### Fetching Bech addresses ######
-RPC = "http://127.0.0.1:16657"
-num_msgs = 30
 
+RPC, num_msgs = "http://127.0.0.1:16657", 30
+
+#### Fetching Bech addresses ######
 acc1, acc1err = fetch_bech_address(f"account{FROM}")
 if len(acc1err):
     sys.exit(acc1err)
@@ -174,5 +172,4 @@ if len(after_acc2_balanceerr):
 acc1_diff = int(before_acc1_balance) - int(after_acc1_balance) if int(before_acc1_balance) > int(after_acc1_balance) else int(after_acc1_balance) - int(before_acc1_balance)
 acc2_diff = int(before_acc2_balance) - int(after_acc2_balance) if int(before_acc2_balance) > int(after_acc2_balance) else int(after_acc2_balance) - int(before_acc2_balance)
 
-print(f"The amount deducted from acc1 is: {acc1_diff}")
-print(f"The amount deducted from acc2 is: {acc2_diff}")
+print(f"The amount deducted from acc1 is: {acc1_diff}\nThe amount deducted from acc2 is: {acc2_diff}")

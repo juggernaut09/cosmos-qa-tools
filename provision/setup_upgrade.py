@@ -7,7 +7,7 @@ import shutil
 from dotenv import dotenv_values
 
 ### Fetch env values
-config = dotenv_values(".env")
+config = dotenv_values('.env')
 DAEMON = config['DAEMON']
 DENOM = config['DENOM']
 CHAINID = config['CHAINID']
@@ -16,7 +16,7 @@ GH_URL = config['GH_URL']
 CHAIN_VERSION = config['CHAIN_VERSION']
 UPGRADE_NAME = config['UPGRADE_NAME']
 UPGRADE_VERSION = config['UPGRADE_VERSION']
-HOME = config['HOME']
+HOME = os.getenv('HOME')
 
 def node_type(x):
     x = int(x)
@@ -27,25 +27,35 @@ def node_type(x):
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be upgraded. Min. 2 should be given')
 args = parser.parse_args()
-print(f" ** Number of nodes : {args.nodes} to be upgraded **")
-os.environ['NODES'] = str(args.nodes)
+print(f" ** Number of nodes : {args.nodes} to be upgraded **") 
+NODES = str(args.nodes)
 os.chdir(os.path.expanduser('~'))
 
 ### Build the upgrade version
 if not GH_URL:
     sys.exit('The environment varible \'GH_URL\' is None make sure to update the env values in .env file')
 
-os.environ['REPO'] = GH_URL.split('/')[-1]
-shutil.rmtree(f"{os.getenv('REPO')}")
-subprocess.run(['git', 'clone', f"{GH_URL}"])
-os.chdir(f"{os.getenv('REPO')}")
-subprocess.run(['git', 'fetch'])
-subprocess.run(['git', 'checkout', f"{UPGRADE_VERSION}"])
-subprocess.run(['make', 'build'])
+REPO = GH_URL.split('/')[-1]
+shutil.rmtree(REPO)
 
-for i in range(1, int(os.getenv('NODES')) + 1):
-    os.environ[f"DAEMON_HOME_{i}"] = f"{DAEMON_HOME}-{i}"
-    os.makedirs(f"{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin")
-    shutil.copy(f"{HOME}/{os.getenv('REPO')}/build/{UPGRADE_NAME}", f"{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin/")
+git = {
+    'clone' : f"git clone {GH_URL}",
+    'fetch' : 'git fetch',
+    'checkout' : f"git checkout {UPGRADE_VERSION}",
+    'build' : "make build"
+}
+subprocess.run(git['clone'].split())
+os.chdir(REPO)
+subprocess.run(git['fetch'].split())
+subprocess.run(git['checkout'].split())
+subprocess.run(git['build'].split())
+
+for i in range(1, int(NODES) + 1):
+    os.environ[f'{DAEMON_HOME}_{i}'] = f"{DAEMON_HOME}-{i}"
+    try:
+        os.makedirs(f"{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin")
+    except FileExistsError as e:
+        print(f"The path '{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin' already exists, skipping the creation.")
+    shutil.copy(f"{HOME}/{REPO}/build/{DAEMON}", f"{DAEMON_HOME}-{i}/cosmovisor/upgrades/{UPGRADE_NAME}/bin/")
 
 print("-------- New upgraded binary is moved to cosmovisor ---------")

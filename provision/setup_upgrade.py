@@ -1,10 +1,6 @@
-import argparse
-import os
-import subprocess
-import sys
-import shutil
-
+import argparse, os, subprocess, sys, shutil
 from dotenv import dotenv_values
+from utils.types import node_type
 
 ### Fetch env values
 config = dotenv_values('.env')
@@ -17,12 +13,6 @@ CHAIN_VERSION = config['CHAIN_VERSION']
 UPGRADE_NAME = config['UPGRADE_NAME']
 UPGRADE_VERSION = config['UPGRADE_VERSION']
 HOME = os.getenv('HOME')
-
-def node_type(x):
-    x = int(x)
-    if x < 2:
-        raise argparse.ArgumentTypeError(f"The number of nodes should be Min. 2, you have entered {x}")
-    return x
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing nodes configuration.')
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be upgraded. Min. 2 should be given')

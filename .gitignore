@@ -1,3 +1,4 @@
 venv/
 ex.py
 .env
+__pycache__

@@ -47,14 +47,22 @@ deactivate  # don't exit until you're done using dependencies.
 > Note: .env file is not included. The file should be created. (Take below format as reference or see the .env.example file)
 
 ```bash
-DAEMON=gaiad
+DAEMON=simd
 DENOM=uatom
 CHAINID=test
-DAEMON_HOME=${HOME}/.gaiad
-GH_URL=https://github.com/cosmos/gaia
-CHAIN_VERSION=v6.0.3
+DAEMON_HOME=${HOME}/.simd
+GH_URL=https://github.com/cosmos/cosmos-sdk
+CHAIN_VERSION='v0.45.1'
+UPGRADE_NAME=test
+UPGRADE_VERSION='v0.46.0-alpha4'
 ```
 
+## Before running the scripts make sure to set the PYTHONPATH
+> Note: $HOME/cosmos-qa-tools is customised.
+```bash
+echo 'export PYTHONPATH=$PYTHONPATH:$HOME/cosmos-qa-tools' >> ~/.bashrc
+source ~/.bashrc
+```
 ## Scripts:-
 
 1. `cosmos_multinode.py` :- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created.

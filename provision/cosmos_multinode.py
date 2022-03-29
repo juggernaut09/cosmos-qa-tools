@@ -1,12 +1,10 @@
-import argparse
-import os
-import subprocess
-import sys
-import shutil
-import requests
+import argparse, os, subprocess, sys, shutil, requests
 
 from dotenv import dotenv_values
 from subprocess import check_output
+from utils.commands import is_tool
+
+from utils.types import node_type
 
 #Fetch env values
 config = dotenv_values(".env")
@@ -19,17 +17,6 @@ CHAIN_VERSION = config['CHAIN_VERSION']
 HOME = os.getenv('HOME')
 USER = os.getenv('USER')
 
-def node_type(x):
-    x = int(x)
-    if x < 2:
-        raise argparse.ArgumentTypeError(f"The number of nodes should be Min. 2, you have entered {x}")
-    return x
-
-def is_tool(binary):
-    """Check whether `name` is on PATH and marked as executable."""
-    from shutil import which
-    return which(binary) is not None
-
 ### Fetch NODES and ACCOUNTS values
 parser = argparse.ArgumentParser(description='This program takes inputs for setting up the required number of nodes.')
 parser.add_argument('nodes', type= node_type, help= 'Number of nodes to be set up. Min. 2 should be given')
@@ -37,7 +24,7 @@ parser.add_argument('accounts', type= int, help= 'Number of Accounts to be set u
 args = parser.parse_args()
 print(f" ** Number of nodes : {args.nodes} and accounts : {args.accounts} to be setup **") 
 NODES, ACCOUNTS = str(args.nodes), str(args.accounts)
-os.chdir(os.path.expanduser('~'))
+os.chdir(os.path.expanduser(HOME))
 
 ### Cosmosvisor installation
 print("--------- Install cosmovisor-------")

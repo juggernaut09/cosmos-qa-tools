@@ -1,10 +1,9 @@
-import argparse
-import subprocess
-import os
-import sys
-import json
-import time
+import argparse, os, sys, json, time
 from dotenv import dotenv_values
+from utils.bank import balance_query, print_balance_deductions
+from utils.commands import command_processor
+from utils.keys import fetch_bech_address
+from utils.types import account_type
 
 ### Fetch env values
 config = dotenv_values(".env")
@@ -12,29 +11,7 @@ DAEMON = config['DAEMON']
 DENOM = config['DENOM']
 CHAINID = config['CHAINID']
 DAEMON_HOME = config['DAEMON_HOME']
-
-def command_processor(command):
-    stdout, stderr = subprocess.Popen(command.split(),
-                                    stdout = subprocess.PIPE,
-                                    stderr = subprocess.PIPE).communicate()
-    return stdout.strip().decode(), stderr.strip().decode()
-
-def fetch_bech_address(account_name):
-    command = f"{DAEMON} keys show {account_name} -a --home {DAEMON_HOME}-1 --keyring-backend test" 
-    return command_processor(command)
-
-def balance_query(bech_address, RPC):
-    command = f"{DAEMON} q bank balances {bech_address} --node {RPC} --output json"
-    balance, balanceerr = command_processor(command)
-    balance = json.loads(balance)
-    balance = int(balance['balances'][0]['amount'])
-    return balance, balanceerr
-
-def account_type(x):
-    _stdout, stderr = fetch_bech_address(f"account{x}")
-    if len(stderr):
-        raise argparse.ArgumentTypeError(stderr)
-    return int(x)
+HOME = os.getenv('HOME')
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('FROM', type= account_type, help= 'From which account the transaction should be intialized')
@@ -44,7 +21,7 @@ FROM, TO = int(args.FROM), int(args.TO)
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
 
-RPC, num_txs = "http://127.0.0.1:16657", 1000
+RPC, num_txs = "http://127.0.0.1:16657", 1
 
 #### Fetching Bech addresses ######
 acc1, acc1err = fetch_bech_address(f"account{FROM}")
@@ -65,7 +42,7 @@ if len(before_acc2_balanceerr):
     sys.exit(before_acc2_balanceerr)
 
 #### Sequences ####
-os.chdir(os.path.expanduser('~'))
+os.chdir(os.path.expanduser(HOME))
 command = f"{DAEMON} q account {acc1} --node {RPC} --output json"
 seq1, seq1err = command_processor(command)
 seq1 = json.loads(seq1)
@@ -80,7 +57,7 @@ if len(seq2err):
 seq2 = json.loads(seq2)
 seq2no = int(seq2['sequence'])
 
-for i in range(0, num_txs + 1):
+for i in range(0, num_txs):
     seqto = seq1no + i
     seqfrom = seq2no + i
     sTxto= f"{DAEMON} tx bank send {acc1} {acc2} 1000000{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {seqto}" 
@@ -109,7 +86,8 @@ after_acc2_balance, after_acc2_balanceerr = balance_query(acc2, RPC)
 if len(after_acc2_balanceerr):
     sys.exit(after_acc2_balanceerr)
 
-acc1_diff = int(before_acc1_balance) - int(after_acc1_balance) if int(before_acc1_balance) > int(after_acc1_balance) else int(after_acc1_balance) - int(before_acc1_balance)
-acc2_diff = int(before_acc2_balance) - int(after_acc2_balance) if int(before_acc2_balance) > int(after_acc2_balance) else int(after_acc2_balance) - int(before_acc2_balance)
+acc1_diff = int(before_acc1_balance) - int(after_acc1_balance)
+acc2_diff = int(before_acc2_balance) - int(after_acc2_balance)
 
-print(f"The amount deducted from acc1 is: {acc1_diff}\nThe amount deducted from acc2 is: {acc2_diff}")
+print_balance_deductions('account1', acc1_diff)
+print_balance_deductions('account2', acc2_diff)

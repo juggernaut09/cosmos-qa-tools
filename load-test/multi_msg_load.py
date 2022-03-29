@@ -28,7 +28,6 @@ def balance_query(bech_address, RPC):
     balance, balanceerr = command_processor(command)
     balance = json.loads(balance)
     balance = int(balance['balances'][0]['amount'])
-    print(f"{bech_address} : {balance} : {type(balance)}") 
     return balance, balanceerr
 
 def write_json(file_name):
@@ -40,7 +39,7 @@ def write_json(file_name):
             json.dump(file_data, file, indent = 4)
 
 def account_type(x):
-    stdout, stderr = fetch_bech_address(f"account{x}")
+    _stdout, stderr = fetch_bech_address(f"account{x}")
     if len(stderr):
         raise argparse.ArgumentTypeError(stderr)
     return int(x)
@@ -99,7 +98,7 @@ seq2 = json.loads(seq2)
 seq2no = int(seq2['sequence'])
 
 for i in range(0, int(NUM_TXS) + 1):
-    unsignedTxto_command = f"{DAEMON} tx bank send {acc1} {acc2} 100{DENOM} --chain-id {CHAINID} --output json --generate-only --gas 500000"
+    unsignedTxto_command = f"{DAEMON} tx bank send {acc1} {acc2} 1000{DENOM} --chain-id {CHAINID} --output json --generate-only --gas 500000"
     unsignedTxto, unsignedTxtoerr = command_processor(unsignedTxto_command)
     if len(unsignedTxtoerr):
         sys.exit(unsignedTxtoerr) 
